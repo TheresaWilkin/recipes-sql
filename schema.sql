@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS recipes (
+	id SERIAL PRIMARY KEY,
+	name TEXT NOT NULL,
+	description TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS tags (
+	id SERIAL PRIMARY KEY,
+	tag TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS steps (
+	id SERIAL PRIMARY KEY,
+	recipe_id INTEGER REFERENCES recipes,
+	step_order INTEGER NOT NULL,
+	name TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS recipes_tags (
+	recipe_id INTEGER REFERENCES recipes,
+	tag_id INTEGER REFERENCES tags,
+	PRIMARY KEY (recipe_id, tag_id)
+);
