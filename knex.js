@@ -36,24 +36,22 @@ app.post('/recipes', function(req, res) {
 
 		var stepsPromise= new Promise(function(resolve, reject) {
 			knex('steps').insert(stepObjects, 'id').then(data => {
-				console.log('steps promise');
 				resolve(data);
 			});
 		});
 
-		var tagsPromise = new Promise(function(resolve, reject) {
-			tagObjects.forEach(tag => {
-				knex('tags').select('tag').where(tag).then(function(data) {
+		var tagsPromises = tagObjects.map(tag => {
+				return knex('tags').select('tag').where(tag).then(function(data) {
 					if (data.toString() === '') {
 						knex('tags').returning('id').insert(tag).then();
 					};
 				});
-			})
-		});
+			});
 
-		Promise.all([stepsPromise, tagsPromise])
+		tagsPromises.push(stepsPromise);
+
+		Promise.all(tagsPromises)
 			.then(function() {
-				console.log('starting then');
 				tagObjects.forEach(tag => {
 					knex('tags').select('id').where(tag)
 						.then(function(data) {
